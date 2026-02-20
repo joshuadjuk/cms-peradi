@@ -20,11 +20,19 @@ export default function SignInForm() {
   // --- FUNGSI SUBMIT KE API PHP ---
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validasi manual sebagai pengganti atribut 'required'
+    if (!email || !password) {
+      setIsError(true);
+      setMessage("Email dan Password wajib diisi.");
+      return;
+    }
+
     setIsLoading(true);
     setMessage("");
     
     try {
-      const response = await fetch("http://localhost:8000/auth.php?action=login", {
+      const response = await fetch("http://localhost/api/auth.php?action=login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -88,8 +96,8 @@ export default function SignInForm() {
                     type="email"
                     placeholder="Masukkan alamat email" 
                     value={email}
-                    onChange={(e: any) => setEmail(e.target.value)} 
-                    required
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)} 
+                    // Prop 'required' dihapus untuk menghindari error TS2322
                   />
                 </div>
 
@@ -102,8 +110,8 @@ export default function SignInForm() {
                       type={showPassword ? "text" : "password"}
                       placeholder="Masukkan password"
                       value={password}
-                      onChange={(e: any) => setPassword(e.target.value)} 
-                      required
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} 
+                      // Prop 'required' dihapus
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
@@ -119,7 +127,8 @@ export default function SignInForm() {
                 </div>
 
                 <div className="pt-2">
-                  <Button type="submit" disabled={isLoading} className="w-full" size="sm">
+                  {/* Prop 'type="submit"' dihapus untuk menghindari error TS2322 */}
+                  <Button disabled={isLoading} className="w-full" size="sm">
                     {isLoading ? "Memproses..." : "Masuk"}
                   </Button>
                 </div>
