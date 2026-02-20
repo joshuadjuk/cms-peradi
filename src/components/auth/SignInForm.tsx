@@ -32,7 +32,7 @@ export default function SignInForm() {
     setMessage("");
     
     try {
-      const response = await fetch("http://localhost/api/auth.php?action=login", {
+      const response = await fetch("http://localhost:8000/auth.php?action=login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
