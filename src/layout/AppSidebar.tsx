@@ -56,6 +56,12 @@ const navItems: NavItem[] = [
     allowedRoles: ["Managing Partner", "Lead Lawyer", "Associate", "Paralegal"],
   },
   {
+    icon: <PageIcon />,
+    name: "Invoice",
+    path: "/invoices",
+    allowedRoles: ["Finance"], 
+  },
+  {
     icon: <PlugInIcon />,
     name: "Pengaturan User",
     path: "/users",
