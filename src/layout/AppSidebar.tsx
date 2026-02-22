@@ -68,6 +68,12 @@ const navItems: NavItem[] = [
     // HANYA Super Admin dan Managing Partner yang bisa melihat menu ini
     allowedRoles: ["Super Admin", "Managing Partner"],
   },
+  {
+    icon: <GridIcon />, // Kamu bisa ganti pakai icon yang lebih cocok misal ShieldIcon / ListIcon
+    name: "Log Aktivitas",
+    path: "/activity-logs",
+    allowedRoles: ["Super Admin", "Managing Partner"], 
+  },
 ];
 
 const AppSidebar: React.FC = () => {

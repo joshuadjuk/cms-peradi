@@ -1,5 +1,17 @@
 <?php
-// Panggil koneksi database
+// Izinkan akses CORS (Cross-Origin Resource Sharing) dari React (Opsional tapi disarankan)
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Content-Type: application/json; charset=UTF-8");
+
+// Handle preflight request (OPTIONS) dari browser
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
+// Panggil koneksi database (Pastikan di dalam db.php sudah ada fungsi catatLog ya!)
 require_once './conf/db.php';
 
 // Tangkap parameter 'action'. Defaultnya kosong.
@@ -35,6 +47,16 @@ switch ($action) {
 
             // Verifikasi password (menggunakan algoritma bcrypt)
             if (password_verify($password, $user['password'])) {
+                
+                // ==========================================
+                // INTEGRASI LOG AKTIVITAS (AUDIT TRAIL)
+                // ==========================================
+                $deskripsi = "User berhasil login ke dalam sistem dengan Role: " . $user['role_name'];
+                
+                // Memanggil helper fungsi log yang ada di db.php
+                catatLog($conn, $user['id'], $user['name'], 'Login', 'Autentikasi', $deskripsi);
+                // ==========================================
+
                 // Hapus field password sebelum dikirim ke Frontend demi keamanan
                 unset($user['password']);
 
@@ -44,6 +66,7 @@ switch ($action) {
                     "data" => $user
                 ]);
             } else {
+                // (Opsional) Kalau mau super ketat, salah password juga bisa dicatat log-nya di sini
                 echo json_encode(["status" => "error", "message" => "Password yang Anda masukkan salah."]);
             }
         } else {

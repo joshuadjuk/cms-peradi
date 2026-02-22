@@ -28,4 +28,15 @@ if ($conn->connect_error) {
         "message" => "Koneksi database gagal: " . $conn->connect_error
     ]));
 }
+
+// ... (kode koneksi database kamu yang sudah ada di atasnya) ...
+
+// Tambahkan fungsi ini di baris paling bawah db.php
+function catatLog($conn, $user_id, $user_name, $action, $module, $description) {
+    $ip_address = $_SERVER['REMOTE_ADDR'];
+    $query = "INSERT INTO activity_logs (user_id, user_name, action, module, description, ip_address) VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("isssss", $user_id, $user_name, $action, $module, $description, $ip_address);
+    $stmt->execute();
+}
 ?>

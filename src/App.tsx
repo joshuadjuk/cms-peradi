@@ -13,6 +13,7 @@ import Documents from "./pages/Documents";
 import Schedules from "./pages/Schedules";
 import CaseDetail from "./pages/CaseDetail";
 import Invoices from "./pages/Invoices";
+import ActivityLogs from "./pages/ActivityLogs";
 
 export default function App() {
   return (
@@ -31,6 +32,8 @@ export default function App() {
             <Route path="/documents" element={<Documents />} />
             <Route path="/schedules" element={<Schedules />} />
             <Route path="/invoices" element={<Invoices />} />
+            <Route path="/activity-logs" element={<ActivityLogs />} />
+
             
             {/* Halaman Pengaturan User */}
             <Route path="/users" element={<Users />} />
