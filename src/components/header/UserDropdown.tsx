@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 
 // Definisikan tipe data untuk User yang kita simpan di localStorage
 interface UserData {
+  id?: number; // <-- Tambahan: ID dibutuhkan untuk pencatatan log
   name: string;
   email: string;
   role_name: string;
@@ -32,11 +33,37 @@ export default function UserDropdown() {
     setIsOpen(false);
   }
 
-  // Fungsi untuk Log Out
-  function handleLogout(e: React.MouseEvent) {
+  // ==========================================
+  // Fungsi untuk Log Out yang terintegrasi Audit Trail
+  // ==========================================
+  async function handleLogout(e: React.MouseEvent) {
     e.preventDefault(); // Mencegah perilaku default link
-    localStorage.removeItem("user"); // Hapus kunci akses
-    navigate("/signin"); // Tendang ke halaman login
+
+    const storedUser = localStorage.getItem("user");
+    
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      
+      try {
+        // Tembak API PHP untuk mencatat log aktivitas "Logout"
+        await fetch("http://localhost:8000/auth.php?action=logout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: parsedUser.id,
+            name: parsedUser.name,
+          }),
+        });
+      } catch (error) {
+        console.error("Gagal mencatat log logout:", error);
+      }
+    }
+
+    // Setelah proses kirim log selesai, hapus sesi dari browser
+    localStorage.removeItem("user"); 
+    
+    // Tendang ke halaman login
+    navigate("/signin"); 
   }
 
   return (

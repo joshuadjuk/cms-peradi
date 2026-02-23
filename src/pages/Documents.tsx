@@ -103,6 +103,7 @@ export default function Documents() {
     uploadData.append("doc_type", formData.doc_type);
     uploadData.append("status", formData.status);
     uploadData.append("file", file); // Masukkan file fisiknya
+    
 
     try {
       // Perhatikan: Saat mengirim FormData, JANGAN set header "Content-Type".

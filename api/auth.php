@@ -80,7 +80,28 @@ switch ($action) {
     // case 'register': 
     //    ...
     //    break;
+    case 'logout':
+        // Tangkap input JSON dari React
+        $data = json_decode(file_get_contents("php://input"));
 
+        // Pastikan ada data user yang dikirim untuk dicatat di log
+        if (!empty($data->id) && !empty($data->name)) {
+            
+            // ==========================================
+            // INTEGRASI LOG AKTIVITAS (AUDIT TRAIL)
+            // ==========================================
+            $deskripsi = "User berhasil logout dari sistem.";
+            
+            // Panggil fungsi pencatat log
+            catatLog($conn, $data->id, $data->name, 'Logout', 'Autentikasi', $deskripsi);
+            // ==========================================
+
+            echo json_encode(["status" => "success", "message" => "Logout berhasil dicatat."]);
+        } else {
+            echo json_encode(["status" => "error", "message" => "Data user tidak valid untuk logout."]);
+        }
+        break;
+        
     default:
         echo json_encode(["status" => "error", "message" => "Action tidak valid. Gunakan ?action=login"]);
         break;

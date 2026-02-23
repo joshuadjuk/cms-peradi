@@ -1,4 +1,15 @@
 <?php
+// Izinkan akses CORS
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Content-Type: application/json; charset=UTF-8");
+
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
 require_once __DIR__ . '/conf/db.php';
 
 $action = isset($_GET['action']) ? $_GET['action'] : '';
@@ -54,7 +65,18 @@ switch ($action) {
         
         $stmt = $conn->prepare("INSERT INTO cases (client_id, case_number, title, type, status) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("issss", $client_id, $case_number, $title, $type, $status);
+        
         if($stmt->execute()) {
+            // ==========================================
+            // LOG: CATAT PENAMBAHAN PERKARA BARU
+            // ==========================================
+            $user_id = isset($data->user_id) ? intval($data->user_id) : 0;
+            $user_name = isset($data->user_name) ? $conn->real_escape_string($data->user_name) : 'System';
+            $desc = "Menambahkan perkara baru: " . $title . " (Tipe: " . $type . ")";
+            
+            catatLog($conn, $user_id, $user_name, 'Create', 'Manajemen Perkara', $desc);
+            // ==========================================
+
             echo json_encode(["status" => "success", "message" => "Data perkara berhasil ditambahkan."]);
         } else {
             echo json_encode(["status" => "error", "message" => "Gagal menambahkan perkara."]);
@@ -63,7 +85,6 @@ switch ($action) {
         break;
 
     case 'update':
-        // FUNGSI BARU UNTUK EDIT DATA
         $data = json_decode(file_get_contents("php://input"));
         if(empty($data->id) || empty($data->client_id) || empty($data->title) || empty($data->type)) {
             echo json_encode(["status" => "error", "message" => "Data tidak lengkap untuk diupdate."]);
@@ -81,6 +102,16 @@ switch ($action) {
         $stmt->bind_param("issssi", $client_id, $case_number, $title, $type, $status, $id);
         
         if($stmt->execute()) {
+            // ==========================================
+            // LOG: CATAT UPDATE PERKARA
+            // ==========================================
+            $user_id = isset($data->user_id) ? intval($data->user_id) : 0;
+            $user_name = isset($data->user_name) ? $conn->real_escape_string($data->user_name) : 'System';
+            $desc = "Memperbarui data perkara ID " . $id . " menjadi status: " . $status;
+            
+            catatLog($conn, $user_id, $user_name, 'Update', 'Manajemen Perkara', $desc);
+            // ==========================================
+
             echo json_encode(["status" => "success", "message" => "Data perkara berhasil diperbarui."]);
         } else {
             echo json_encode(["status" => "error", "message" => "Gagal memperbarui perkara."]);
@@ -94,7 +125,18 @@ switch ($action) {
         
         $stmt = $conn->prepare("DELETE FROM cases WHERE id = ?");
         $stmt->bind_param("i", $id);
+        
         if($stmt->execute()) {
+            // ==========================================
+            // LOG: CATAT PENGHAPUSAN PERKARA
+            // ==========================================
+            $user_id = isset($data->user_id) ? intval($data->user_id) : 0;
+            $user_name = isset($data->user_name) ? $conn->real_escape_string($data->user_name) : 'System';
+            $desc = "Menghapus data perkara ID " . $id . " secara permanen";
+            
+            catatLog($conn, $user_id, $user_name, 'Delete', 'Manajemen Perkara', $desc);
+            // ==========================================
+
             echo json_encode(["status" => "success", "message" => "Perkara berhasil dihapus secara permanen."]);
         } else {
             echo json_encode(["status" => "error", "message" => "Gagal menghapus perkara."]);
